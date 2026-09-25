@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17171d">
+  <title>MBean1 — musical sketchbox</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MBean1</p>
+        <h1>Musical sketchbox</h1>
+      </div>
+      <div class="transport">
+        <button id="playBtn" class="primary">▶ Play</button>
+        <button id="stopBtn">■ Stop</button>
+        <label>BPM <input id="bpmInput" type="number" min="45" max="220" value="110"></label>
+      </div>
+    </header>
+
+    <section class="panel compact">
+      <div class="track-tabs" id="trackTabs"></div>
+      <div class="instrument-row">
+        <label>Sound
+          <select id="instrumentSelect">
+            <option value="sine">Soft sine</option>
+            <option value="triangle">Triangle</option>
+            <option value="square">Square</option>
+            <option value="sawtooth">Saw</option>
+            <option value="pluck">Pluck</option>
+          </select>
+        </label>
+        <label>Volume <input id="volumeInput" type="range" min="0" max="1" step=".01" value=".65"></label>
+        <button id="clearTrackBtn">Clear track</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Piano roll</h2>
+          <p>Click cells to place notes. Drag across the ruler to select a region.</p>
+        </div>
+        <span id="selectionLabel" class="selection-label">Selection: all 16 steps</span>
+      </div>
+
+      <div id="roll" class="roll" aria-label="Piano roll"></div>
+
+      <div class="editbar">
+        <button data-edit="transposeUp">↑ Transpose</button>
+        <button data-edit="transposeDown">↓ Transpose</button>
+        <button data-edit="duplicate">Duplicate →</button>
+        <button data-edit="reverse">Reverse</button>
+        <button data-edit="clear">Clear region</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Variation bench</h2>
+          <p>Generate three nearby alternatives from only the selected region. Nothing outside it changes.</p>
+        </div>
+        <button id="makeVariantsBtn" class="primary">Make 3 variants</button>
+      </div>
+      <div id="variants" class="variants">
+        <p class="muted">Select a region, then generate variants.</p>
+      </div>
+    </section>
+
+    <section class="panel compact">
+      <div class="section-head">
+        <div>
+          <h2>Project</h2>
+          <p>Autosaves locally in this browser.</p>
+        </div>
+        <div class="project-actions">
+          <button id="newBtn">New</button>
+          <button id="saveBtn">Save now</button>
+          <button id="exportBtn">Export JSON</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span id="status">Ready.</span>
+      <span>Keys: Space play/stop · 1–4 tracks · A–K place notes on the current step</span>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
