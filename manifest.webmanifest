@@ -1,0 +1,9 @@
+{
+  "name":"MBean1",
+  "short_name":"MBean1",
+  "description":"A local-first musical sketchbox for quickly shaping playable music ideas.",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#101014",
+  "theme_color":"#17171d"
+}
