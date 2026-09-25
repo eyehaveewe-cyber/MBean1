@@ -141,3 +141,4 @@ document.addEventListener("keydown",e=>{
   if(idx>=0&&idx<PITCHES.length){state.tracks[state.currentTrack].notes[state.currentStep][PITCHES.length-1-idx]=true;saveLocal();renderAll();}
 });
 loadLocal();renderAll();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
