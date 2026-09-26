@@ -166,12 +166,12 @@ function renderRoll(){
       e.preventDefault();
       dragStart=s;
       state.selection=[s,s];
-      renderAll();
+      $("#selectionLabel").textContent=`Selection: steps ${s+1}–${s+1}`;
     };
     d.onpointerenter=()=>{
       if(dragStart!==null){
         state.selection=[Math.min(dragStart,s),Math.max(dragStart,s)];
-        renderAll();
+        $("#selectionLabel").textContent=`Selection: steps ${state.selection[0]+1}–${state.selection[1]+1}`;
       }
     };
     roll.appendChild(d);
@@ -198,13 +198,13 @@ function renderRoll(){
         notePaint={pi,value};
         paintNote(s,pi,value);
         generatedVariants=[];
-        renderAll();
+        c.classList.toggle("on",value);
       };
       c.onpointerenter=()=>{
         if(notePaint&&notePaint.pi===pi){
           paintNote(s,pi,notePaint.value);
           generatedVariants=[];
-          renderAll();
+          c.classList.toggle("on",notePaint.value);
         }
       };
       roll.appendChild(c);
@@ -466,8 +466,16 @@ function resizeProject(newBars){
   saveLocal();generatedVariants=[];renderAll();
 }
 
-document.addEventListener("pointerup",()=>{dragStart=null;notePaint=null;saveLocal();});
-document.addEventListener("pointercancel",()=>{dragStart=null;notePaint=null;saveLocal();});
+document.addEventListener("pointerup",()=>{
+  const changed=dragStart!==null||notePaint!==null;
+  dragStart=null;notePaint=null;
+  if(changed){saveLocal();renderAll();}
+});
+document.addEventListener("pointercancel",()=>{
+  const changed=dragStart!==null||notePaint!==null;
+  dragStart=null;notePaint=null;
+  if(changed){saveLocal();renderAll();}
+});
 
 $("#playBtn").onclick=()=>playing?stopPlay():startPlay();
 $("#stopBtn").onclick=()=>{stopPlay();status("Stopped.");};
