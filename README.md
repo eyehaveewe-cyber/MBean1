@@ -4,13 +4,15 @@ MBean1 is a local-first browser music sketchbox: a small composition workbench f
 
 ## Prototype features
 
-- 4 independent tracks: Lead, Harmony, Bass, Pulse
-- 16-step piano roll
+- Add, duplicate, rename, remove, and mix up to 16 tracks
+- Multi-bar piano roll with 4-bar editor pages
 - Browser-native Web Audio playback
 - Per-track instrument and volume
 - Real CC0 sampled flute and oboe (VSCO 2 CE)
 - Compact CC0 acoustic drum kit (Virtuosity Drums)
 - Adjustable BPM
+- Held notes: drag horizontally across a pitch to sustain it instead of retriggering every step
+- Project lengths from 4 to 128 bars (about 4:39 at 110 BPM)
 - Drag-select a step range from the ruler
 - Local region operations: transpose, duplicate, reverse, clear
 - Three nearby variation modes that only alter the selected region
@@ -53,7 +55,7 @@ Generation is deliberately local. MBean1 should behave like an instrument and ed
 7. Reharmonization tools
 8. WAV rendering/export
 9. Project import
-10. Larger arrangements beyond one 16-step loop
+10. Arrangement blocks, looping regions, and copy/paste between sections
 
 ## Status
 
