@@ -8,6 +8,8 @@ MBean1 is a local-first browser music sketchbox: a small composition workbench f
 - 16-step piano roll
 - Browser-native Web Audio playback
 - Per-track instrument and volume
+- Real CC0 sampled flute and oboe (VSCO 2 CE)
+- Compact CC0 acoustic drum kit (Virtuosity Drums)
 - Adjustable BPM
 - Drag-select a step range from the ruler
 - Local region operations: transpose, duplicate, reverse, clear
@@ -16,6 +18,7 @@ MBean1 is a local-first browser music sketchbox: a small composition workbench f
 - JSON project export
 - Keyboard shortcuts
 - PWA manifest + service worker for offline caching after first served load
+- Sample audio is fetched from the original CC0 GitHub sources on first use, then runtime-cached when served over HTTP/HTTPS
 
 ## Running it
 
@@ -43,7 +46,7 @@ Generation is deliberately local. MBean1 should behave like an instrument and ed
 
 1. Import/export MIDI
 2. Better note lengths and velocity
-3. Real sample-based instruments and drum kits
+3. More velocity layers, articulations, and locally vendored sample packs
 4. Click-and-drag note painting
 5. Branching variation history
 6. Hum-to-note microphone input
