@@ -2,23 +2,23 @@ const PITCHES=["B4","A#4","A4","G#4","G4","F#4","F4","E4","D#4","D4","C#4","C4"]
 const FREQ={C4:261.63,"C#4":277.18,D4:293.66,"D#4":311.13,E4:329.63,F4:349.23,"F#4":369.99,G4:392,"G#4":415.3,A4:440,"A#4":466.16,B4:493.88};
 const SAMPLE_BANKS={
   fluteSample:[
-    {root:"C4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Flute/susNV/LDFlute_susNV_C4_v1_1.wav"},
-    {root:"E4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Flute/susNV/LDFlute_susNV_E4_v1_1.wav"},
-    {root:"A4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Flute/susNV/LDFlute_susNV_A4_v1_1.wav"}
+    {root:"C4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/440300901dfe9275fd84e0b7763af1f8443ae62e/Woodwinds/Flute/susNV/LDFlute_susNV_C4_v1_1.wav"},
+    {root:"E4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/440300901dfe9275fd84e0b7763af1f8443ae62e/Woodwinds/Flute/susNV/LDFlute_susNV_E4_v1_1.wav"},
+    {root:"A4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/440300901dfe9275fd84e0b7763af1f8443ae62e/Woodwinds/Flute/susNV/LDFlute_susNV_A4_v1_1.wav"}
   ],
   oboeSample:[
-    {root:"D4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Oboe/Sus/Oboe_Sus_D4_v1_Main.wav"},
-    {root:"F4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Oboe/Sus/Oboe_Sus_F4_v1_Main.wav"},
-    {root:"A#4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Oboe/Sus/Oboe_Sus_A%234_v1_Main.wav"}
+    {root:"D4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/440300901dfe9275fd84e0b7763af1f8443ae62e/Woodwinds/Oboe/Sus/Oboe_Sus_D4_v1_Main.wav"},
+    {root:"F4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/440300901dfe9275fd84e0b7763af1f8443ae62e/Woodwinds/Oboe/Sus/Oboe_Sus_F4_v1_Main.wav"},
+    {root:"A#4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/440300901dfe9275fd84e0b7763af1f8443ae62e/Woodwinds/Oboe/Sus/Oboe_Sus_A%234_v1_Main.wav"}
   ]
 };
 const DRUM_SAMPLES={
-  kick:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/kick/oh_kick_snon_vl3_rr1.flac",
-  snare:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/snare/oh_snare_center_vl18.flac",
-  tom:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/htom/oh_htom_center_vl8.flac",
-  closedHat:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/hh/oh_hh_closed_vl3_rr1.flac",
-  openHat:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/hh/oh_hh_open_vl2_rr1.flac",
-  crash:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/crash/oh_crash_crash_vl2_rr1.flac"
+  kick:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc/Samples/oh/kick/oh_kick_snon_vl3_rr1.flac",
+  snare:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc/Samples/oh/snare/oh_snare_center_vl18.flac",
+  tom:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc/Samples/oh/htom/oh_htom_center_vl8.flac",
+  closedHat:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc/Samples/oh/hh/oh_hh_closed_vl3_rr1.flac",
+  openHat:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc/Samples/oh/hh/oh_hh_open_vl2_rr1.flac",
+  crash:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/9f04cf9a734527edfbb0a4eee1f674e45bbf71bc/Samples/oh/crash/oh_crash_crash_vl2_rr1.flac"
 };
 const DRUM_MAP={
   C4:"kick","C#4":"kick",D4:"snare","D#4":"snare",E4:"tom",F4:"tom",
@@ -58,7 +58,10 @@ function renderTabs(){
   state.tracks.forEach((t,i)=>{
     const b=document.createElement("button");
     b.className="track-tab"+(i===state.currentTrack?" active":"");
-    b.innerHTML=`${i+1}. ${t.name}<small>${t.instrument}</small>`;
+    b.textContent=`${i+1}. ${t.name}`;
+    const meta=document.createElement("small");
+    meta.textContent=t.instrument;
+    b.appendChild(meta);
     b.onclick=()=>{state.currentTrack=i;generatedVariants=[];renderAll();};
     el.appendChild(b);
   });
