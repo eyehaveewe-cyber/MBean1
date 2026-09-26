@@ -8,6 +8,8 @@ Source: **VS Chamber Orchestra: Community Edition (VSCO 2 CE)** by Versilian Stu
 
 Repository: https://github.com/sgossner/VSCO-2-CE
 
+Pinned commit: `440300901dfe9275fd84e0b7763af1f8443ae62e`
+
 License: **CC0 1.0**.
 
 Current source notes:
@@ -23,6 +25,8 @@ Source: **Virtuosity Drums** by Versilian Studios and Karoryfer Samples.
 
 Repository: https://github.com/sfzinstruments/virtuosity_drums
 
+Pinned commit: `9f04cf9a734527edfbb0a4eee1f674e45bbf71bc`
+
 License: **CC0 1.0**.
 
 Current compact kit:
@@ -34,6 +38,6 @@ Current compact kit:
 - open hi-hat
 - crash
 
-The browser fetches these samples from their upstream raw GitHub paths on first use. When MBean1 is served over HTTP/HTTPS, its service worker runtime-caches fetched audio for subsequent offline use. When opened directly as a `file://` page, service workers are unavailable, so the real samples require network access each session.
+The browser fetches these samples from immutable commit-pinned upstream raw GitHub paths on first use. When MBean1 is served over HTTP/HTTPS, its service worker runtime-caches fetched audio for subsequent offline use. When opened directly as a `file://` page, service workers are unavailable, so the real samples require network access each session.
 
 If a sample cannot load or decode, MBean1 falls back to a simple synthesized tone rather than stopping playback.
