@@ -1,4 +1,4 @@
-const CACHE="mbean1-v4";
+const CACHE="mbean1-v5";
 const CORE=["./","./index.html","./styles.css","./app.js","./manifest.webmanifest"];
 const ALLOWED_RUNTIME_HOSTS=new Set(["raw.githubusercontent.com"]);
 
