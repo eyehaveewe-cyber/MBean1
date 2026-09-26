@@ -20,12 +20,14 @@
         <button id="playBtn" class="primary">▶ Play</button>
         <button id="stopBtn">■ Stop</button>
         <label>BPM <input id="bpmInput" type="number" min="45" max="220" value="110"></label>
+        <span id="durationLabel" class="duration-pill">~1:10</span>
       </div>
     </header>
 
     <section class="panel compact">
       <div class="track-tabs" id="trackTabs"></div>
       <div class="instrument-row">
+        <label>Name <input id="trackNameInput" type="text" maxlength="24" value="Lead"></label>
         <label>Sound
           <select id="instrumentSelect">
             <option value="sine">Soft sine</option>
@@ -39,6 +41,9 @@
           </select>
         </label>
         <label>Volume <input id="volumeInput" type="range" min="0" max="1" step=".01" value=".65"></label>
+        <button id="addTrackBtn">+ Track</button>
+        <button id="duplicateTrackBtn">Duplicate track</button>
+        <button id="removeTrackBtn">Remove track</button>
         <button id="clearTrackBtn">Clear track</button>
       </div>
     </section>
@@ -47,12 +52,30 @@
       <div class="section-head">
         <div>
           <h2>Piano roll</h2>
-          <p>Click cells to place notes. Drag across the ruler to select a region.</p>
+          <p>Click for a short note. Drag horizontally across one pitch to hold it. Drag the ruler to select a region.</p>
         </div>
-        <span id="selectionLabel" class="selection-label">Selection: all 16 steps</span>
+        <span id="selectionLabel" class="selection-label">Selection: steps 1–16</span>
       </div>
 
-      <div id="roll" class="roll" aria-label="Piano roll"></div>
+      <div class="timeline-toolbar">
+        <button id="prevPageBtn">← 4 bars</button>
+        <span id="pageLabel" class="page-label">Bars 1–4</span>
+        <button id="nextPageBtn">4 bars →</button>
+        <label>Project length
+          <select id="barsSelect">
+            <option value="4">4 bars</option>
+            <option value="8">8 bars</option>
+            <option value="16">16 bars</option>
+            <option value="32" selected>32 bars (~1 min)</option>
+            <option value="64">64 bars (~2 min)</option>
+            <option value="128">128 bars (~4–5 min)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="roll-wrap">
+        <div id="roll" class="roll" aria-label="Piano roll"></div>
+      </div>
 
       <div class="editbar">
         <button data-edit="transposeUp">↑ Transpose</button>
@@ -67,7 +90,7 @@
       <div class="section-head">
         <div>
           <h2>Variation bench</h2>
-          <p>Generate three nearby alternatives from only the selected region. Nothing outside it changes.</p>
+          <p>Generate three nearby alternatives from only the selected region. Held notes stay editable as ordinary painted spans.</p>
         </div>
         <button id="makeVariantsBtn" class="primary">Make 3 variants</button>
       </div>
@@ -92,7 +115,7 @@
 
     <footer>
       <span id="status">Ready.</span>
-      <span>Keys: Space play/stop · 1–4 tracks · A–K place notes on the current step</span>
+      <span>Keys: Space play/stop · 1–9 choose track · A–' place a note at the current step</span>
     </footer>
   </main>
   <script src="app.js"></script>
