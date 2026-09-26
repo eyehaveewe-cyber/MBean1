@@ -393,7 +393,10 @@ function playStepNotes(step){
     if(!on)return;
     if(t.instrument!=="drumsSample"&&step>0&&t.notes[step-1][pi])return;
     const hold=runLength(t,step,pi);
-    const dur=t.instrument==="drumsSample"?unit:Math.max(unit*.92,hold*unit*.97);
+    const isWoodwind=t.instrument==="fluteSample"||t.instrument==="oboeSample";
+    const dur=t.instrument==="drumsSample"
+      ? unit
+      : Math.max(isWoodwind?.32:unit*.92,hold*unit*.97);
     playVoice(PITCHES[pi],dur,t.volume*.18,t.instrument);
   }));
 }
