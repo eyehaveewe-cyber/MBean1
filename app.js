@@ -1,5 +1,37 @@
 const PITCHES=["B4","A#4","A4","G#4","G4","F#4","F4","E4","D#4","D4","C#4","C4"];
 const FREQ={C4:261.63,"C#4":277.18,D4:293.66,"D#4":311.13,E4:329.63,F4:349.23,"F#4":369.99,G4:392,"G#4":415.3,A4:440,"A#4":466.16,B4:493.88};
+const SAMPLE_BANKS={
+  fluteSample:[
+    {root:"C4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Flute/susNV/LDFlute_susNV_C4_v1_1.wav"},
+    {root:"E4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Flute/susNV/LDFlute_susNV_E4_v1_1.wav"},
+    {root:"A4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Flute/susNV/LDFlute_susNV_A4_v1_1.wav"}
+  ],
+  oboeSample:[
+    {root:"D4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Oboe/Sus/Oboe_Sus_D4_v1_Main.wav"},
+    {root:"F4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Oboe/Sus/Oboe_Sus_F4_v1_Main.wav"},
+    {root:"A#4",url:"https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Woodwinds/Oboe/Sus/Oboe_Sus_A%234_v1_Main.wav"}
+  ]
+};
+const DRUM_SAMPLES={
+  kick:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/kick/oh_kick_snon_vl3_rr1.flac",
+  snare:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/snare/oh_snare_center_vl18.flac",
+  tom:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/htom/oh_htom_center_vl8.flac",
+  closedHat:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/hh/oh_hh_closed_vl3_rr1.flac",
+  openHat:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/hh/oh_hh_open_vl2_rr1.flac",
+  crash:"https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/oh/crash/oh_crash_crash_vl2_rr1.flac"
+};
+const DRUM_MAP={
+  C4:"kick","C#4":"kick",D4:"snare","D#4":"snare",E4:"tom",F4:"tom",
+  "F#4":"closedHat",G4:"closedHat","G#4":"openHat",A4:"openHat","A#4":"crash",B4:"crash"
+};
+const DRUM_LABELS={
+  C4:"Kick","C#4":"Kick+",D4:"Snare","D#4":"Snare+",E4:"Tom",F4:"Tom+",
+  "F#4":"Closed hat",G4:"Closed hat+","G#4":"Open hat",A4:"Open hat+","A#4":"Crash",B4:"Crash+"
+};
+const NOTE_SEMITONES={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const sampleBuffers=new Map();
+const sampleFailures=new Set();
+
 const makeTrack=(name,instrument,volume)=>({name,instrument,volume,notes:Array.from({length:16},()=>Array(PITCHES.length).fill(false))});
 let state={
   bpm:110, currentTrack:0, selection:[0,15], currentStep:0,
@@ -7,7 +39,7 @@ let state={
     makeTrack("Lead","triangle",.62),
     makeTrack("Harmony","sine",.45),
     makeTrack("Bass","square",.38),
-    makeTrack("Pulse","pluck",.33)
+    makeTrack("Drums","drumsSample",.42)
   ]
 };
 let audioCtx=null, timer=null, playing=false, playStep=0, dragStart=null, generatedVariants=[];
@@ -43,7 +75,7 @@ function renderRoll(){
     roll.appendChild(d);
   }
   PITCHES.forEach((p,pi)=>{
-    const l=document.createElement("div");l.className="pitch-label";l.textContent=p;roll.appendChild(l);
+    const l=document.createElement("div");l.className="pitch-label";l.textContent=state.tracks[state.currentTrack].instrument==="drumsSample"?(DRUM_LABELS[p]||p):p;roll.appendChild(l);
     for(let s=0;s<16;s++){
       const c=document.createElement("div");
       const on=state.tracks[state.currentTrack].notes[s][pi];
@@ -77,21 +109,101 @@ function renderVariants(){
   });
 }
 function renderAll(){renderTabs();renderControls();renderRoll();renderVariants();}
-function noteOn(freq,dur,vol,type){
+function ensureAudio(){
   if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-  const now=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  return audioCtx;
+}
+function noteToMidi(note){
+  const m=/^([A-G])(#?)(-?\d+)$/.exec(note);
+  if(!m)return 60;
+  return (Number(m[3])+1)*12+NOTE_SEMITONES[m[1]]+(m[2]?1:0);
+}
+function nearestSample(bank,note){
+  const target=noteToMidi(note);
+  return bank.reduce((best,s)=>Math.abs(noteToMidi(s.root)-target)<Math.abs(noteToMidi(best.root)-target)?s:best,bank[0]);
+}
+async function loadSample(url){
+  if(sampleBuffers.has(url))return sampleBuffers.get(url);
+  if(sampleFailures.has(url))throw new Error("sample unavailable");
+  try{
+    const ctx=ensureAudio();
+    const response=await fetch(url,{mode:"cors"});
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    const buffer=await ctx.decodeAudioData(await response.arrayBuffer());
+    sampleBuffers.set(url,buffer);
+    return buffer;
+  }catch(err){
+    sampleFailures.add(url);
+    throw err;
+  }
+}
+function sampleFor(instrument,note){
+  if(instrument==="fluteSample"||instrument==="oboeSample"){
+    const source=nearestSample(SAMPLE_BANKS[instrument],note);
+    return {url:source.url,rate:Math.pow(2,(noteToMidi(note)-noteToMidi(source.root))/12),drum:false};
+  }
+  if(instrument==="drumsSample"){
+    const key=DRUM_MAP[note]||"closedHat";
+    return {url:DRUM_SAMPLES[key],rate:1,drum:true};
+  }
+  return null;
+}
+function oscillatorNote(freq,dur,vol,type){
+  const ctx=ensureAudio(),now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();
   o.frequency.value=freq;o.type=type==="pluck"?"triangle":type;
   g.gain.setValueAtTime(type==="pluck"?vol*.9:vol,now);
   if(type==="pluck")g.gain.exponentialRampToValueAtTime(.001,now+Math.max(.05,dur*.55));
   else{g.gain.setValueAtTime(vol,now+dur*.75);g.gain.exponentialRampToValueAtTime(.001,now+dur);}
-  o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+dur+.03);
+  o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+dur+.03);
+}
+function playLoadedSample(spec,note,dur,vol){
+  const buffer=sampleBuffers.get(spec.url);
+  if(!buffer)return false;
+  const ctx=ensureAudio(),now=ctx.currentTime,source=ctx.createBufferSource(),g=ctx.createGain();
+  source.buffer=buffer;source.playbackRate.value=spec.rate;
+  g.gain.setValueAtTime(Math.max(.001,vol*(spec.drum?1.8:2.2)),now);
+  source.connect(g);g.connect(ctx.destination);
+  source.start(now);
+  if(spec.drum){
+    g.gain.exponentialRampToValueAtTime(.001,now+Math.min(2.5,buffer.duration/spec.rate));
+  }else{
+    const end=Math.min(buffer.duration/spec.rate,Math.max(.08,dur*.95));
+    g.gain.setValueAtTime(Math.max(.001,vol*2.2),now+Math.max(.01,end*.72));
+    g.gain.exponentialRampToValueAtTime(.001,now+end);
+    source.stop(now+end+.03);
+  }
+  return true;
+}
+function playVoice(note,dur,vol,instrument){
+  const spec=sampleFor(instrument,note);
+  if(spec&&playLoadedSample(spec,note,dur,vol))return;
+  oscillatorNote(FREQ[note],dur,vol,instrument==="drumsSample"?"triangle":instrument);
+}
+function neededSampleUrls(){
+  const urls=new Set();
+  state.tracks.forEach(t=>t.notes.forEach(step=>step.forEach((on,pi)=>{
+    if(!on)return;
+    const spec=sampleFor(t.instrument,PITCHES[pi]);
+    if(spec)urls.add(spec.url);
+  })));
+  return [...urls];
+}
+async function preloadNeededSamples(){
+  const urls=neededSampleUrls().filter(u=>!sampleBuffers.has(u)&&!sampleFailures.has(u));
+  if(!urls.length)return;
+  status(`Loading ${urls.length} real sample${urls.length===1?"":"s"}…`);
+  const results=await Promise.allSettled(urls.map(loadSample));
+  const ok=results.filter(r=>r.status==="fulfilled").length;
+  if(ok<urls.length)status(`Loaded ${ok}/${urls.length} samples; fallback synth will cover the rest.`);
 }
 function playStepNotes(step){
-  const beat=60/state.bpm, dur=beat*.22;
-  state.tracks.forEach(t=>t.notes[step].forEach((on,pi)=>{if(on)noteOn(FREQ[PITCHES[pi]],dur,t.volume*.18,t.instrument);}));
+  const beat=60/state.bpm,dur=beat*.22;
+  state.tracks.forEach(t=>t.notes[step].forEach((on,pi)=>{if(on)playVoice(PITCHES[pi],dur,t.volume*.18,t.instrument);}));
 }
-function startPlay(){
-  stopPlay();playing=true;playStep=0;$("#playBtn").textContent="❚❚ Pause";
+async function startPlay(){
+  stopPlay();ensureAudio();await preloadNeededSamples();
+  playing=true;playStep=0;$("#playBtn").textContent="❚❚ Pause";
   const tick=()=>{playStepNotes(playStep);renderRoll();playStep=(playStep+1)%16;};
   tick();timer=setInterval(tick,(60/state.bpm/4)*1000);status("Playing.");
 }
