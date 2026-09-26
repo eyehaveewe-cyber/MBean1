@@ -396,7 +396,7 @@ function playStepNotes(step){
     const isWoodwind=t.instrument==="fluteSample"||t.instrument==="oboeSample";
     const dur=t.instrument==="drumsSample"
       ? unit
-      : Math.max(isWoodwind?.32:unit*.92,hold*unit*.97);
+      : Math.max(isWoodwind ? .32 : unit*.92,hold*unit*.97);
     playVoice(PITCHES[pi],dur,t.volume*.18,t.instrument);
   }));
 }
